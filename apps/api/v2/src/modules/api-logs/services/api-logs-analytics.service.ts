@@ -47,7 +47,7 @@ export class ApiLogsAnalyticsService {
         body: JSON.stringify(payload),
       });
     } catch (error) {
-      this.logger.error(`Failed to send analytics: ${error.message}`);
+      this.logger.error(`Failed to send analytics: ${(error as Error).message}`);
     }
   }
 
@@ -77,7 +77,7 @@ export class ApiLogsAnalyticsService {
         body: JSON.stringify(payload),
       });
     } catch (error) {
-      this.logger.error(`Failed to send batch analytics: ${error.message}`);
+      this.logger.error(`Failed to send batch analytics: ${(error as Error).message}`);
     }
   }
 }

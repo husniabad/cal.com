@@ -10,6 +10,7 @@ import { timezonesRouter } from "../publicViewer/timezones/_router";
 import { adminRouter } from "./admin/_router";
 import { aiVoiceAgentRouter } from "./aiVoiceAgent/_router";
 import { apiKeysRouter } from "./apiKeys/_router";
+import { apiLogsRouter } from "./apiLogs";
 import { appsRouter } from "./apps/_router";
 import { attributesRouter } from "./attributes/_router";
 import { authRouter } from "./auth/_router";
@@ -62,6 +63,7 @@ export const viewerRouter = router({
   delegationCredential: delegationCredentialRouter,
   webhook: webhookRouter,
   apiKeys: apiKeysRouter,
+  apiLogs: apiLogsRouter,
   slots: slotsRouter,
   workflows: workflowsRouter,
   saml: ssoRouter,

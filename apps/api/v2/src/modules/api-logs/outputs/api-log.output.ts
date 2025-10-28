@@ -1,17 +1,17 @@
 export class ApiLogOutput {
-  id: string;
-  requestId: string;
-  method: string;
-  endpoint: string;
-  statusCode: number;
-  responseTime: number;
-  isError: boolean;
-  timestamp: Date;
+  id!: string;
+  requestId!: string;
+  method!: string;
+  endpoint!: string;
+  statusCode!: number;
+  responseTime!: number;
+  isError!: boolean;
+  timestamp!: Date;
   errorMessage?: string;
 }
 
 export class ApiLogDetailOutput extends ApiLogOutput {
-  path: string;
+  path!: string;
   queryParams?: any;
   requestHeaders?: any;
   requestBody?: any;
@@ -24,8 +24,8 @@ export class ApiLogDetailOutput extends ApiLogOutput {
 }
 
 export class ApiLogsListOutput {
-  data: ApiLogOutput[];
-  pagination: {
+  data!: ApiLogOutput[];
+  pagination!: {
     page: number;
     perPage: number;
     total: number;
@@ -34,8 +34,8 @@ export class ApiLogsListOutput {
 }
 
 export class ApiLogsStatsOutput {
-  totalCalls: number;
-  errorCalls: number;
-  errorRate: number;
-  avgResponseTime: number;
+  totalCalls!: number;
+  errorCalls!: number;
+  errorRate!: number;
+  avgResponseTime!: number;
 }

@@ -15,9 +15,16 @@ export async function getApiLogsHandler({ ctx, input }: GetApiLogsOptions) {
   const organizationId = ctx.user.organizationId;
   const isAdmin = ctx.user.role === "ADMIN";
 
-  const where: any = {
-    OR: isAdmin && filterUserId ? [{ userId: filterUserId }] : [{ userId }, { organizationId }],
-  };
+  // Build WHERE clause based on access control
+  let where: any = {};
+  
+  if (isAdmin && filterUserId) {
+    where.userId = filterUserId;
+  } else if (organizationId) {
+    where.OR = [{ userId }, { organizationId }];
+  } else {
+    where.userId = userId;
+  }
 
   if (startDate) where.timestamp = { ...where.timestamp, gte: startDate };
   if (endDate) where.timestamp = { ...where.timestamp, lte: endDate };
@@ -47,6 +54,8 @@ export async function getApiLogsHandler({ ctx, input }: GetApiLogsOptions) {
     prisma.apiCallLog.count({ where }),
   ]);
 
+
+
   return {
     data: logs,
     pagination: {
@@ -72,7 +81,7 @@ export async function getApiLogDetailHandler({ ctx, input }: GetApiLogDetailOpti
   return prisma.apiCallLog.findFirst({
     where: {
       id: input.id,
-      OR: [{ userId }, { organizationId }],
+      OR: organizationId ? [{ userId }, { organizationId }] : [{ userId }],
     },
   });
 }
@@ -90,7 +99,7 @@ export async function getApiLogsStatsHandler({ ctx, input }: GetApiLogsStatsOpti
 
   const where: any = {
     timestamp: { gte: input.startDate, lte: input.endDate },
-    OR: [{ userId }, { organizationId }],
+    OR: organizationId ? [{ userId }, { organizationId }] : [{ userId }],
   };
 
   const [totalCalls, errorCalls, avgResponseTime] = await Promise.all([

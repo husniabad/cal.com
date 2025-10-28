@@ -17,7 +17,7 @@ export class ApiLogsCleanupService {
       const result = await this.apiLogsService.cleanup(this.retentionDays);
       this.logger.log(`Cleanup completed: ${result.count} logs deleted`);
     } catch (error) {
-      this.logger.error(`Cleanup failed: ${error.message}`, error.stack);
+      this.logger.error(`Cleanup failed: ${(error as Error).message}`, (error as Error).stack);
     }
   }
 }

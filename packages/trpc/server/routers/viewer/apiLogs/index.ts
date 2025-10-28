@@ -1,4 +1,5 @@
-import { authedProcedure, router } from "@calcom/trpc/server/trpc";
+import authedProcedure from "@calcom/trpc/server/procedures/authedProcedure";
+import { router } from "@calcom/trpc/server/trpc";
 import { ZGetApiLogsInput, ZGetApiLogDetailInput, ZGetApiLogsStatsInput } from "./apiLogs.schema";
 
 type ApiLogsRouterHandlerCache = {

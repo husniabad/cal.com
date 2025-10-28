@@ -29,9 +29,15 @@ function ApiLogsView() {
   const isAdmin = currentUser?.role === "ADMIN";
   const { data: users } = trpc.viewer.teams.list.useQuery(undefined, { enabled: isAdmin });
 
-  const { data, isLoading } = trpc.viewer.apiLogs.list.useQuery(filters, {
-    refetchInterval: 10000, // Refetch every 10 seconds
-  });
+  const { data, isLoading, error, refetch } = trpc.viewer.apiLogs.list.useQuery(
+    filters,
+    {
+      refetchInterval: 10000,
+      retry: 1,
+    }
+  );
+
+
 
   const exportToCSV = () => {
     if (!data?.data.length) return;
@@ -212,19 +218,24 @@ function ApiLogsView() {
                       <td className="border-subtle border-b px-4 py-3 text-sm">
                         {new Date(log.timestamp).toLocaleString()}
                       </td>
-                      <td className="border-subtle border-b px-4 py-3">
-                        <Badge variant="gray">{log.method}</Badge>
+                      <td className="border-subtle border-b px-4 py-3 text-sm">
+                        <Badge variant={log.method === "GET" ? "gray" : log.method === "POST" ? "green" : log.method === "PUT" ? "blue" : log.method === "DELETE" ? "red" : "gray"}>
+                          {log.method}
+                        </Badge>
                       </td>
-                      <td className="border-subtle border-b px-4 py-3 text-sm">{log.endpoint}</td>
-                      <td className="border-subtle border-b px-4 py-3">
-                        <Badge variant={getStatusColor(log.statusCode)}>{log.statusCode}</Badge>
+                      <td className="border-subtle border-b px-4 py-3 text-sm font-mono">
+                        {log.endpoint}
                       </td>
-                      <td className="border-subtle border-b px-4 py-3 text-sm">{log.responseTime}ms</td>
-                      <td className="border-subtle border-b px-4 py-3">
-                        <Button
-                          color="secondary"
-                          size="sm"
-                          onClick={() => router.push(`/settings/developer/api-logs/${log.id}`)}>
+                      <td className="border-subtle border-b px-4 py-3 text-sm">
+                        <Badge variant={getStatusColor(log.statusCode)}>
+                          {log.statusCode}
+                        </Badge>
+                      </td>
+                      <td className="border-subtle border-b px-4 py-3 text-sm">
+                        {log.responseTime}ms
+                      </td>
+                      <td className="border-subtle border-b px-4 py-3 text-sm">
+                        <Button variant="ghost" size="sm" onClick={() => router.push(`/settings/developer/api-logs/${log.id}`)}>
                           {t("view")}
                         </Button>
                       </td>
@@ -233,27 +244,30 @@ function ApiLogsView() {
                 </tbody>
               </table>
             </div>
-
-            {data.data.length > 0 && (
-              <div className="flex items-center justify-between">
+            
+            {data?.pagination && (
+              <div className="flex items-center justify-between px-4 py-3">
                 <div className="text-subtle text-sm">
-                  {t("api_logs_showing_pages", {
-                    page: data?.pagination.page,
-                    totalPages: data?.pagination.totalPages,
-                    total: data?.pagination.total,
-                  })}
+                  Showing {((data.pagination.page - 1) * data.pagination.perPage) + 1} to {Math.min(data.pagination.page * data.pagination.perPage, data.pagination.total)} of {data.pagination.total} results
                 </div>
-                <div className="flex gap-2">
-                  <Button
-                    color="secondary"
-                    disabled={filters.page === 1}
-                    onClick={() => setFilters({ ...filters, page: filters.page - 1 })}>
+                <div className="flex items-center gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    disabled={data.pagination.page <= 1}
+                    onClick={() => setFilters({ ...filters, page: filters.page - 1 })}
+                  >
                     {t("previous")}
                   </Button>
-                  <Button
-                    color="secondary"
-                    disabled={filters.page === data?.pagination.totalPages}
-                    onClick={() => setFilters({ ...filters, page: filters.page + 1 })}>
+                  <span className="text-sm">
+                    Page {data.pagination.page} of {data.pagination.totalPages}
+                  </span>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    disabled={data.pagination.page >= data.pagination.totalPages}
+                    onClick={() => setFilters({ ...filters, page: filters.page + 1 })}
+                  >
                     {t("next")}
                   </Button>
                 </div>

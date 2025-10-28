@@ -39,7 +39,7 @@ export class ApiLogsService {
     ]);
 
     return {
-      data: logs,
+      data: logs as any,
       pagination: { page, perPage, total, totalPages: Math.ceil(total / perPage) },
     };
   }
